@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shikhar — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;1,9..40,300&display=swap" rel="stylesheet" />
+
+  <!-- GSAP Core -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+  <style>
+    :root {
+      --teal: #1ABC9C; --bg: #000; --text: #e8f5f2;
+      --fd: 'Syne', sans-serif; --fb: 'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--fb); overflow-x: hidden; scroll-behavior: auto; cursor: none; }
+    
+    /* ── UI ── */
+    #loader { position: fixed; inset: 0; z-index: 10000; background: #000; display: flex; align-items: center; justify-content: center; }
+    .loader-content { width: 160px; text-align: center; }
+    .loader-percent { font-family: var(--fd); font-size: 3rem; font-weight: 800; color: var(--teal); margin-bottom: 0.5rem; }
+    .loader-line-bg { width: 100%; height: 2px; background: rgba(26,188,156,0.1); }
+    .loader-line { width: 0%; height: 100%; background: var(--teal); transition: width 0.1s linear; }
+    .loader-msg { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; opacity: 0.5; margin-top: 1rem; }
+
+    #cursor-ring { position: fixed; width: 30px; height: 30px; border: 1.5px solid var(--teal); border-radius: 50%; pointer-events: none; z-index: 9999; top: 0; left: 0; will-change: transform; transition: scale 0.3s; }
+    #progress-bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--teal); z-index: 10001; width: 0%; }
+    
+    nav { position: fixed; top: 0; width: 100%; padding: 1.5rem 6vw; display: flex; justify-content: space-between; align-items: center; z-index: 1000; transition: all 0.4s; }
+    nav.scrolled { background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); padding: 1rem 6vw; border-bottom: 1px solid rgba(26,188,156,0.1); }
+    .nav-logo { font-family: var(--fd); font-weight: 800; font-size: 1.2rem; color: #fff; text-decoration: none; }
+    .nav-hire { background: var(--teal); color: #000; padding: 0.7rem 1.5rem; border-radius: 4px; font-weight: 700; text-decoration: none; font-size: 0.8rem; }
+
+    /* ── CANVAS ENGINE ── */
+    #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: 1; pointer-events: none; }
+    canvas { width: 100%; height: 100%; display: block; }
+    
+    /* SCROLLER TRACK (The length of the animation) */
+    .scroll-track { height: 1200vh; position: relative; }
+
+    /* ── OVERLAY TEXT ── */
+    .overlay-container { position: fixed; inset: 0; z-index: 5; pointer-events: none; padding: 0 10vw; display: flex; align-items: center; }
+    .text-scene { position: absolute; max-width: 800px; opacity: 0; visibility: hidden; }
+    .text-scene h2 { font-family: var(--fd); font-size: clamp(3rem, 10vw, 7rem); font-weight: 800; text-transform: uppercase; line-height: 0.85; margin-bottom: 1.5rem; }
+    .text-scene p { font-size: 1.2rem; color: rgba(232,245,242,0.6); max-width: 500px; line-height: 1.6; }
+
+    /* ── CONTENT SECTIONS (Below Scroll Track) ── */
+    .content-area { position: relative; z-index: 10; background: #000; }
+    .grid-section { padding: 8rem 6vw; border-top: 1px solid rgba(26,188,156,0.1); }
+    .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 4rem; }
+    .card { background: #0a1110; border: 1px solid rgba(26,188,156,0.08); padding: 3rem 2rem; border-radius: 12px; transition: 0.4s; }
+    .card:hover { border-color: var(--teal); transform: translateY(-10px); }
+
+    @media (max-width: 768px) {
+      .card-grid { grid-template-columns: 1fr; }
+      .text-scene h2 { font-size: 3.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loader">
+    <div class="loader-content">
+      <div class="loader-percent">0</div>
+      <div class="loader-line-bg"><div class="loader-line"></div></div>
+      <div class="loader-msg" id="loader-msg">Loading Sequence...</div>
+    </div>
+  </div>
+
+  <div id="cursor-ring"></div>
+  <div id="progress-bar"></div>
+
+  <nav id="nav">
+    <a href="#" class="nav-logo">SHIKHAR</a>
+    <a href="mailto:hello@yoursite.com" class="nav-hire">Hire Me</a>
+  </nav>
+
+  <!-- ── CANVAS ── -->
+  <div id="canvas-container">
+    <canvas id="sequence-canvas"></canvas>
+  </div>
+
+  <!-- ── TEXT OVERLAYS ── -->
+  <div class="overlay-container">
+    <div class="text-scene" id="ts1">
+      <h2>I build<br>powerful<br>systems</h2>
+      <p>Architecting robust foundations for the next generation of digital products.</p>
+    </div>
+    <div class="text-scene" id="ts2">
+      <h2>That<br>generate<br>results</h2>
+      <p>Every pixel and line of code is optimized for conversion and high-performance growth.</p>
+    </div>
+    <div class="text-scene" id="ts3">
+      <h2>And craft<br>cinematic<br>stories</h2>
+      <p>Bringing brands to life through motion design and high-end visual production.</p>
+    </div>
+  </div>
+
+  <!-- ── SCROLL TRIGGER TRACK ── -->
+  <div class="scroll-track"></div>
+
+  <!-- ── FINAL CONTENT ── -->
+  <div class="content-area">
+    <section class="grid-section">
+      <h3 style="font-family:var(--fd); font-size:3rem; margin-bottom:1rem;">Selected Projects</h3>
+      <p style="opacity:0.5; margin-bottom:4rem;">Crafted with precision and performance in mind.</p>
+      <div class="card-grid">
+        <div class="card"><h4 style="font-family:var(--fd); font-size:1.5rem; margin-bottom:1rem;">Project Alpha</h4><p style="opacity:0.6;">SaaS Infrastructure</p></div>
+        <div class="card"><h4 style="font-family:var(--fd); font-size:1.5rem; margin-bottom:1rem;">Beta Commerce</h4><p style="opacity:0.6;">Luxury E-Commerce</p></div>
+        <div class="card"><h4 style="font-family:var(--fd); font-size:1.5rem; margin-bottom:1rem;">Gamma Digital</h4><p style="opacity:0.6;">Interactive Motion</p></div>
+      </div>
+    </section>
+
+    <footer style="padding:10rem 6vw; text-align:center;">
+      <h2 style="font-family:var(--fd); font-size:clamp(2rem, 8vw, 4rem); margin-bottom:2rem;">Let's Create Together</h2>
+      <a href="mailto:hello@yoursite.com" style="background:var(--teal); color:#000; padding:1.2rem 3rem; text-decoration:none; font-weight:800; border-radius:4px;">START A PROJECT</a>
+    </footer>
+  </div>
+
+  <script>
+    /* ── CONFIGURATION ── */
+    const scenes = [
+      { path: './public/frames/Webdev_video/', count: 144 },
+      { path: './public/frames/E-Commerce_video/', count: 144 },
+      { path: './public/frames/VideoEditing_video/', count: 144 }
+    ];
+    const totalFrames = scenes.reduce((acc, scene) => acc + scene.count, 0);
+    const framePrefix = 'frame_';
+    const frameNumberPad = 4;
+    const fileExtension = '.webp';
+
+    const canvas = document.getElementById('sequence-canvas');
+    const ctx = canvas.getContext('2d');
+    const images = [];
+    const sequence = { frame: 0 }; 
+
+    /* ── PRELOAD ENGINE ── */
+    function loadImages() {
+      console.log(`Preloading ${totalFrames} frames across ${scenes.length} scenes...`);
+      let loaded = 0;
+      const loaderP = document.querySelector('.loader-percent');
+      const loaderL = document.querySelector('.loader-line');
+
+      // Pre-fill images array with placeholders to maintain order
+      for (let i = 0; i < totalFrames; i++) images.push(null);
+
+      let currentGlobalIndex = 0;
+      scenes.forEach((scene) => {
+        for (let i = 1; i <= scene.count; i++) {
+          const index = currentGlobalIndex;
+          const img = new Image();
+          const frameNum = i.toString().padStart(frameNumberPad, '0');
+          img.src = `${scene.path}${framePrefix}${frameNum}${fileExtension}`;
+          
+          img.onload = () => {
+            images[index] = img;
+            loaded++;
+            const progress = Math.floor((loaded / totalFrames) * 100);
+            if (loaderP) loaderP.textContent = progress;
+            if (loaderL) loaderL.style.width = progress + '%';
+            
+            if (loaded === totalFrames) {
+              console.log('All frames loaded successfully.');
+              init(); 
+            }
+          };
+          img.onerror = () => {
+            console.warn(`Failed: ${img.src}`);
+            loaded++;
+            if (loaded === totalFrames) init();
+          }
+          currentGlobalIndex++;
+        }
+      });
+    }
+
+    /* ── CANVAS RENDER ENGINE ── */
+    function render() {
+      const img = images[sequence.frame];
+      if (!img) return;
+
+      const canvasRatio = canvas.width / canvas.height;
+      const imgRatio = img.width / img.height;
+      let drawW, drawH, drawX, drawY;
+
+      if (canvasRatio > imgRatio) {
+        drawW = canvas.width;
+        drawH = canvas.width / imgRatio;
+        drawX = 0;
+        drawY = (canvas.height - drawH) / 2;
+      } else {
+        drawW = canvas.height * imgRatio;
+        drawH = canvas.height;
+        drawX = (canvas.width - drawW) / 2;
+        drawY = 0;
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, drawX, drawY, drawW, drawH);
+    }
+
+    /* ── INITIALIZATION ── */
+    function init() {
+      gsap.registerPlugin(ScrollTrigger);
+
+      gsap.to('#loader', { opacity: 0, duration: 0.8, delay: 0.2, onComplete: () => {
+        document.getElementById('loader').style.display = 'none';
+      }});
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth * window.devicePixelRatio;
+        canvas.height = window.innerHeight * window.devicePixelRatio;
+        render();
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      // GSAP FRAME ANIMATION
+      gsap.to(sequence, {
+        frame: totalFrames - 1,
+        snap: "frame",
+        ease: "none",
+        scrollTrigger: {
+          trigger: ".scroll-track",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1
+        },
+        onUpdate: render 
+      });
+
+      // TEXT OVERLAYS TRIGGER
+      const textTL = gsap.timeline({
+        scrollTrigger: {
+          trigger: ".scroll-track",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: true
+        }
+      });
+
+      // Scene 1: 0-33%
+      textTL.to("#ts1", { opacity: 1, visibility: 'visible', y: -20, duration: 1 }, 0);
+      textTL.to("#ts1", { opacity: 0, y: -40, duration: 1 }, 1);
+
+      // Scene 2: 33-66%
+      textTL.to("#ts2", { opacity: 1, visibility: 'visible', y: -20, duration: 1 }, 1.5);
+      textTL.to("#ts2", { opacity: 0, y: -40, duration: 1 }, 2.5);
+
+      // Scene 3: 66-100%
+      textTL.to("#ts3", { opacity: 1, visibility: 'visible', y: -20, duration: 1 }, 3);
+      textTL.to("#ts3", { opacity: 0, y: -40, duration: 1 }, 4);
+
+      ScrollTrigger.create({
+        start: 'top -50',
+        onToggle: s => document.getElementById('nav').classList.toggle('scrolled', s.isActive)
+      });
+      ScrollTrigger.create({
+        start: 'top top', end: 'bottom bottom',
+        onUpdate: s => gsap.set('#progress-bar', { width: s.progress * 100 + '%' })
+      });
+
+      const ring = document.getElementById('cursor-ring');
+      window.addEventListener('mousemove', e => {
+        gsap.to(ring, { x: e.clientX - 15, y: e.clientY - 15, duration: 0.15 });
+      });
+    }
+
+    // Start Loading
+    loadImages();
+
+  </script>
+</body>
+</html>

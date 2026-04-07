@@ -1,0 +1,608 @@
+/* ============================================================
+   CSS CUSTOM PROPERTIES & RESET
+============================================================ */
+:root {
+  --teal:        #1ABC9C;
+  --teal-dark:   #16A085;
+  --yellow:      #F1C40F;
+  --orange:      #E67E22;
+  --red:         #E74C3C;
+  --bg:          #080f0e;
+  --bg-mid:      #0d1a18;
+  --text:        #e8f5f2;
+  --text-dim:    rgba(232,245,242,0.5);
+
+  --font-display: 'Syne', sans-serif;
+  --font-body:    'DM Sans', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: auto; /* GSAP handles this */
+  font-size: 16px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ============================================================
+   CUSTOM CURSOR
+============================================================ */
+#cursor {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  background: var(--teal);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, background 0.2s ease;
+  mix-blend-mode: difference;
+}
+
+#cursor-ring {
+  position: fixed;
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid rgba(26,188,156,0.6);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease;
+}
+
+body:hover #cursor-ring { opacity: 1; }
+
+a:hover ~ #cursor, button:hover ~ #cursor {
+  width: 20px; height: 20px;
+}
+
+/* ============================================================
+   SCROLL PROGRESS BAR
+============================================================ */
+#progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--teal), var(--yellow));
+  z-index: 1000;
+  transform-origin: left center;
+}
+
+/* ============================================================
+   NAV
+============================================================ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 900;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 3rem;
+  mix-blend-mode: difference;
+}
+
+.nav-logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-weight: 400;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover { color: var(--teal); }
+
+/* ============================================================
+   SECTION BASE
+============================================================ */
+section {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ============================================================
+   VIDEO WRAPPER — inside pinned sections
+============================================================ */
+.video-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.video-wrap video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+/* Dark scrim over video */
+.video-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(8,15,14,0.3) 0%, rgba(8,15,14,0.75) 100%);
+}
+
+/* ============================================================
+   HERO SECTION
+============================================================ */
+#hero {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 40%, rgba(26,188,156,0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 70%, rgba(22,160,133,0.08) 0%, transparent 60%),
+    var(--bg);
+  z-index: 0;
+}
+
+/* Noise texture overlay */
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 2rem;
+}
+
+.hero-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+}
+
+.hero-headline {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 7rem);
+  font-weight: 800;
+  line-height: 1.05;
+  color: var(--text);
+  overflow: hidden;
+}
+
+.hero-headline .line {
+  display: block;
+  overflow: hidden;
+}
+
+.hero-headline .line span {
+  display: block;
+  transform: translateY(110%);
+}
+
+/* Teal accent word */
+.hero-headline em {
+  font-style: normal;
+  color: var(--teal);
+}
+
+.hero-sub {
+  margin-top: 2rem;
+  font-size: 1rem;
+  color: var(--text-dim);
+  font-weight: 300;
+  letter-spacing: 0.02em;
+  opacity: 0;
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0;
+}
+
+.scroll-indicator span {
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.scroll-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, var(--teal), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50%       { opacity: 1;   transform: scaleY(1.1); }
+}
+
+/* Grid lines decorative */
+.grid-lines {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+}
+
+.grid-line {
+  border-left: 1px solid rgba(26,188,156,0.04);
+  height: 100%;
+}
+
+/* ============================================================
+   PINNED STORY SECTIONS
+============================================================ */
+.story-content {
+  position: absolute;
+  z-index: 2;
+  padding: 0 6vw;
+  bottom: 12vh;
+  left: 0;
+}
+
+.section-number {
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 1.2rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.section-tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--teal);
+  padding: 0.25rem 0.75rem;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+}
+
+.story-headline {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 5.5rem);
+  font-weight: 800;
+  line-height: 1.05;
+  max-width: 700px;
+  overflow: hidden;
+}
+
+.story-headline .word {
+  display: inline-block;
+  overflow: hidden;
+  margin-right: 0.25em;
+}
+
+.story-headline .word span {
+  display: inline-block;
+  transform: translateY(110%);
+}
+
+.story-body {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  color: var(--text-dim);
+  font-weight: 300;
+  max-width: 420px;
+  line-height: 1.7;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Side decorative number */
+.side-label {
+  position: absolute;
+  right: 5vw;
+  top: 50%;
+  transform: translateY(-50%) rotate(90deg);
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  z-index: 2;
+}
+
+/* ============================================================
+   SECTION 1 — WEB DEV
+============================================================ */
+#section-webdev .video-wrap::after {
+  background: radial-gradient(ellipse at 30% 60%, rgba(8,15,14,0.2) 0%, rgba(8,15,14,0.85) 100%);
+}
+
+/* ============================================================
+   SECTION 2 — ECOMMERCE
+============================================================ */
+#section-ecom .video-wrap::after {
+  background: radial-gradient(ellipse at 70% 40%, rgba(8,15,14,0.15) 0%, rgba(8,15,14,0.85) 100%);
+}
+
+#section-ecom .glow-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(ellipse 50% 50% at 70% 40%, rgba(241,196,15,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ============================================================
+   SECTION 3 — VIDEO EDITING
+============================================================ */
+#section-edit .video-wrap::after {
+  background: radial-gradient(ellipse at 50% 50%, rgba(8,15,14,0.1) 0%, rgba(8,15,14,0.9) 100%);
+}
+
+#section-edit .story-headline .char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(30px) rotate(4deg);
+}
+
+/* ============================================================
+   TRANSITION STRIP BETWEEN SECTIONS
+============================================================ */
+.section-divider {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  opacity: 0.3;
+}
+
+/* ============================================================
+   CTA SECTION
+============================================================ */
+#cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-mid);
+  min-height: 100vh;
+}
+
+.cta-inner {
+  text-align: center;
+  padding: 0 2rem;
+}
+
+.cta-eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.cta-headline {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  max-width: 700px;
+  margin: 0 auto 3rem;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.cta-headline em {
+  font-style: normal;
+  color: var(--teal);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--bg);
+  background: var(--teal);
+  padding: 1.1rem 2.8rem;
+  position: relative;
+  overflow: hidden;
+  transition: color 0.3s;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--yellow);
+  transform: translateX(-101%);
+  transition: transform 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+  z-index: 0;
+}
+
+.btn-primary:hover::before { transform: translateX(0); }
+.btn-primary span { position: relative; z-index: 1; }
+
+.btn-primary .arrow {
+  position: relative;
+  z-index: 1;
+  font-size: 1.1rem;
+  transition: transform 0.3s;
+}
+.btn-primary:hover .arrow { transform: translateX(4px); }
+
+/* ============================================================
+   FOOTER
+============================================================ */
+footer {
+  background: var(--bg);
+  padding: 2rem 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(26,188,156,0.08);
+}
+
+footer p {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+
+footer .foot-links {
+  display: flex;
+  gap: 2rem;
+}
+
+footer a {
+  color: var(--text-dim);
+  text-decoration: none;
+  font-size: 0.75rem;
+  transition: color 0.3s;
+}
+
+footer a:hover { color: var(--teal); }
+
+/* ============================================================
+   PLACEHOLDER VIDEO FALLBACKS (gradient backgrounds)
+============================================================ */
+.vid-placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+#section-webdev .vid-placeholder {
+  background: linear-gradient(135deg, #0a2020 0%, #0d3030 40%, #091a1a 100%);
+}
+
+#section-ecom .vid-placeholder {
+  background: linear-gradient(135deg, #0f1a0a 0%, #1a2a10 40%, #0a1508 100%);
+}
+
+#section-edit .vid-placeholder {
+  background: linear-gradient(135deg, #10101a 0%, #1a1030 40%, #0a0815 100%);
+}
+
+/* Animated grid for placeholders */
+.placeholder-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(26,188,156,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26,188,156,0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridShift 8s linear infinite;
+}
+
+@keyframes gridShift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 60px 60px; }
+}
+
+#section-ecom .placeholder-grid {
+  background-image:
+    linear-gradient(rgba(241,196,15,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(241,196,15,0.04) 1px, transparent 1px);
+}
+
+#section-edit .placeholder-grid {
+  background-image:
+    linear-gradient(rgba(231,76,60,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(231,76,60,0.04) 1px, transparent 1px);
+}
+
+/* Floating accent blobs in placeholders */
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  animation: blobFloat 6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes blobFloat {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(20px, -30px) scale(1.05); }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 768px) {
+  nav { padding: 1.2rem 1.5rem; }
+  .nav-links { display: none; }
+
+  .hero-headline { font-size: clamp(2.2rem, 10vw, 4rem); }
+
+  .story-content { padding: 0 1.5rem; bottom: 8vh; }
+  .story-headline { font-size: clamp(2rem, 8vw, 3.5rem); }
+  .story-body { font-size: 0.9rem; }
+
+  .side-label { display: none; }
+
+  .cta-headline { font-size: clamp(2rem, 8vw, 3.5rem); }
+
+  footer { flex-direction: column; gap: 1rem; text-align: center; }
+
+  #cursor, #cursor-ring { display: none; }
+  body { cursor: auto; }
+}
