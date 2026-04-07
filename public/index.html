@@ -60,6 +60,72 @@
       .card-grid { grid-template-columns: 1fr; }
       .text-scene h2 { font-size: 3.5rem; }
     }
+
+    /* ── NEW CONTACT SECTION ── */
+    .contact-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 100px 6vw;
+      align-items: center;
+      background: #000;
+      border-top: 1px solid rgba(26,188,156,0.1);
+    }
+    .contact-container h2 {
+      font-family: var(--fd);
+      font-size: 3rem;
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+    }
+    .contact-btn {
+      width: 100%;
+      max-width: 350px;
+      padding: 18px;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 4px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .email { background: var(--teal); color: #000; }
+    .whatsapp { background: #25D366; color: white; }
+    .linkedin { background: #0077B5; color: white; }
+    
+    .contact-btn:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 30px rgba(26,188,156,0.2);
+      filter: brightness(1.1);
+    }
+
+    .whatsapp-float {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #25D366;
+      color: white;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 30px;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      transition: 0.3s;
+    }
+    .whatsapp-float:hover {
+      transform: scale(1.1);
+    }
   </style>
 </head>
 <body>
@@ -116,11 +182,35 @@
       </div>
     </section>
 
+    <!-- ── CONTACT SECTION ── -->
+    <div class="contact-container">
+      <h2>Let’s Connect</h2>
+      
+      <!-- Email -->
+      <a href="mailto:shikhar5775@gmail.com" class="contact-btn email">
+        <span>📧</span> Email Me
+      </a>
+
+      <!-- WhatsApp -->
+      <a href="https://wa.me/7760490466?text=Hi%20I%20saw%20your%20portfolio" target="_blank" class="contact-btn whatsapp">
+        <span>💬</span> WhatsApp
+      </a>
+
+      <!-- LinkedIn -->
+      <a href="https://www.linkedin.com/in/shikhar-srivastava-036bb2297/" target="_blank" class="contact-btn linkedin">
+        <span>💼</span> LinkedIn
+      </a>
+    </div>
+
     <footer style="padding:10rem 6vw; text-align:center;">
       <h2 style="font-family:var(--fd); font-size:clamp(2rem, 8vw, 4rem); margin-bottom:2rem;">Let's Create Together</h2>
       <a href="mailto:hello@yoursite.com" style="background:var(--teal); color:#000; padding:1.2rem 3rem; text-decoration:none; font-weight:800; border-radius:4px;">START A PROJECT</a>
     </footer>
   </div>
+
+  <a href="https://wa.me/7760490466" target="_blank" class="whatsapp-float">
+    💬
+  </a>
 
   <script>
     /* ── CONFIGURATION ── */
@@ -268,6 +358,19 @@
       const ring = document.getElementById('cursor-ring');
       window.addEventListener('mousemove', e => {
         gsap.to(ring, { x: e.clientX - 15, y: e.clientY - 15, duration: 0.15 });
+      });
+
+      // 🎬 PREMIUM CONTACT ANIMATION
+      gsap.from(".contact-btn", {
+        opacity: 0,
+        y: 50,
+        stagger: 0.2,
+        duration: 1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: ".contact-container",
+          start: "top 85%"
+        }
       });
     }
 
